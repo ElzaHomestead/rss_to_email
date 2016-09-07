@@ -1,5 +1,6 @@
 import hashlib
 import feedparser
+import config  # Contains absolute paths
 
 def notify(title,link,subscribers):
 	import smtplib
@@ -28,15 +29,15 @@ def notify(title,link,subscribers):
 posts = feedparser.parse("http://elzahomestead.com/feed.xml")
 
 # Generate list of posts from file
-post_list = [line.strip() for line in open("posts.txt")]
+post_list = [line.strip() for line in open(config.posts)]
 
 # Generate MD5 hash for the most current post
 lasthash = hashlib.md5(posts.entries[0].guid).hexdigest()
 
 # Check if lasthash is the last post on file, if not notify subscribers
 if lasthash != post_list[-1]: 
-	subscribers = [sub.strip() for sub in open("subscribers.txt")]
+	subscribers = [sub.strip() for sub in open(config.subs)]
 	title = posts.entries[0].title
 	link = posts.entries[0].link
 	notify(title,link,subscribers)
-	with open("posts.txt","a") as posts: posts.write("\n" + lasthash)
+	with open(config.posts,"a") as posts: posts.write("\n" + lasthash)
